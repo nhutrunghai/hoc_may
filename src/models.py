@@ -1,9 +1,6 @@
 from pathlib import Path
 
-import joblib
-import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -43,9 +40,8 @@ except ImportError:
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-RAW_DATA_PATH = PROJECT_ROOT / "data" / "raw" / "student-por-10.csv"
-PROCESSED_DATA_PATH = PROJECT_ROOT / "data" / "processed" / "student-por-10-processed.csv"
-MODEL_DIR = PROJECT_ROOT / "models"
+RAW_DATA_PATH = PROJECT_ROOT / "data" / "raw" / "student-por-v1.csv"
+PROCESSED_DATA_PATH = PROJECT_ROOT / "data" / "processed" / "student-por-v1-processed.csv"
 REPORT_DIR = PROJECT_ROOT / "reports"
 FIGURE_DIR = REPORT_DIR / "figures"
 
@@ -106,54 +102,7 @@ def evaluate_model(model, X_test: pd.DataFrame, y_test: pd.Series) -> dict:
     }
 
 
-def save_actual_vs_predicted_plot(
-    y_test: pd.Series,
-    y_pred,
-    model_name: str,
-    output_path: Path,
-) -> None:
-    plt.figure(figsize=(8, 6))
-    sns.scatterplot(x=y_test, y=y_pred, color="#2563eb", s=55)
-    min_value = min(y_test.min(), y_pred.min())
-    max_value = max(y_test.max(), y_pred.max())
-    plt.plot([min_value, max_value], [min_value, max_value], color="#dc2626", linewidth=2)
-    plt.xlabel("Actual G3")
-    plt.ylabel("Predicted G3")
-    plt.title(f"Actual vs Predicted - {model_name}")
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=150)
-    plt.close()
-
-
-def save_feature_importance_plot(random_forest_model, output_csv: Path, output_png: Path) -> None:
-    preprocessor = random_forest_model.named_steps["preprocessor"]
-    regressor = random_forest_model.named_steps["model"]
-    feature_names = preprocessor.get_feature_names_out()
-
-    importance_df = (
-        pd.DataFrame(
-            {
-                "feature": feature_names,
-                "importance": regressor.feature_importances_,
-            }
-        )
-        .sort_values("importance", ascending=False)
-        .head(20)
-    )
-    importance_df.to_csv(output_csv, index=False)
-
-    plt.figure(figsize=(10, 7))
-    sns.barplot(data=importance_df, x="importance", y="feature", hue="feature", legend=False)
-    plt.xlabel("Importance")
-    plt.ylabel("Feature")
-    plt.title("Top 20 Feature Importance - Random Forest")
-    plt.tight_layout()
-    plt.savefig(output_png, dpi=150)
-    plt.close()
-
-
-def train_all_models() -> pd.DataFrame:
-    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+def train_all_models(return_models: bool = False):
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -176,28 +125,22 @@ def train_all_models() -> pd.DataFrame:
 
     results = []
     fitted_models = {}
-    model_file_names = {
-        "Linear Regression": "linear_reg.pkl",
-        "Ridge Regression": "ridge_reg.pkl",
-        "Decision Tree Regressor": "decision_tree.pkl",
-        "Random Forest Regressor": "random_forest.pkl",
-    }
-
+    ridge_best_alpha = None
     for model_name, model in models.items():
         print(f"\nDang huan luyen: {model_name}")
         model.fit(X_train, y_train)
 
         best_alpha = None
-        model_to_save = model
+        fitted_model = model
         if isinstance(model, GridSearchCV):
             best_alpha = model.best_params_["model__alpha"]
-            model_to_save = model.best_estimator_
+            ridge_best_alpha = best_alpha
+            fitted_model = model.best_estimator_
 
-        fitted_models[model_name] = model_to_save
-        joblib.dump(model_to_save, MODEL_DIR / model_file_names[model_name])
+        fitted_models[model_name] = fitted_model
 
         metrics = evaluate_model(model, X_test, y_test)
-        results.append({"Model": model_name, **metrics, "Best alpha": best_alpha})
+        results.append({"Model": model_name, **metrics})
 
     results_df = (
         pd.DataFrame(results)
@@ -207,24 +150,24 @@ def train_all_models() -> pd.DataFrame:
     results_df.to_csv(REPORT_DIR / "model_comparison.csv", index=False)
 
     best_model_name = results_df.loc[0, "Model"]
-    best_model = fitted_models[best_model_name]
-    save_actual_vs_predicted_plot(
-        y_test=y_test,
-        y_pred=best_model.predict(X_test),
-        model_name=best_model_name,
-        output_path=FIGURE_DIR / "actual_vs_predicted_best_model.png",
-    )
-    save_feature_importance_plot(
-        random_forest_model=fitted_models["Random Forest Regressor"],
-        output_csv=REPORT_DIR / "random_forest_feature_importance.csv",
-        output_png=FIGURE_DIR / "random_forest_feature_importance.png",
-    )
-
     print("\nBang so sanh mo hinh tren tap Test:")
     print(results_df.to_string(index=False))
     print(f"\nMo hinh tot nhat theo RMSE: {best_model_name}")
+    if ridge_best_alpha is not None:
+        print(f"Best alpha cua Ridge Regression: {ridge_best_alpha}")
+    if return_models:
+        return results_df, fitted_models, X_test, y_test, best_model_name
     return results_df
 
 
+def main() -> None:
+    _, fitted_models, X_test, y_test, best_model_name = train_all_models(return_models=True)
+    try:
+        from .visualize_models import generate_visualizations
+    except ImportError:
+        from visualize_models import generate_visualizations
+
+    generate_visualizations(fitted_models, X_test, y_test, best_model_name)
+
 if __name__ == "__main__":
-    train_all_models()
+    main()

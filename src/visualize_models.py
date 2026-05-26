@@ -1,42 +1,17 @@
 from pathlib import Path
 import os
 
-import joblib
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from sklearn.tree import plot_tree
 
 try:
-    from .models import MODEL_DIR, PROJECT_ROOT, REPORT_DIR, FIGURE_DIR, train_all_models
+    from .models import REPORT_DIR, FIGURE_DIR
 except ImportError:
-    from models import MODEL_DIR, PROJECT_ROOT, REPORT_DIR, FIGURE_DIR, train_all_models
-
-
-MODEL_FILES = {
-    "Linear Regression": "linear_reg.pkl",
-    "Ridge Regression": "ridge_reg.pkl",
-    "Decision Tree Regressor": "decision_tree.pkl",
-    "Random Forest Regressor": "random_forest.pkl",
-}
+    from models import REPORT_DIR, FIGURE_DIR
 
 OPEN_IMAGES_AFTER_SAVE = True
-
-
-def load_trained_models() -> dict:
-    missing_files = [
-        file_name
-        for file_name in MODEL_FILES.values()
-        if not (MODEL_DIR / file_name).exists()
-    ]
-    if missing_files:
-        print("Chua co du model .pkl, dang train lai cac mo hinh...")
-        train_all_models()
-
-    return {
-        model_name: joblib.load(MODEL_DIR / file_name)
-        for model_name, file_name in MODEL_FILES.items()
-    }
 
 
 def print_report_tables() -> None:
@@ -73,7 +48,7 @@ def get_feature_names(model) -> list[str]:
 def plot_model_comparison(output_path: Path) -> None:
     comparison_path = REPORT_DIR / "model_comparison.csv"
     if not comparison_path.exists():
-        train_all_models()
+        raise FileNotFoundError(f"Chua co file bao cao: {comparison_path}")
 
     results_df = pd.read_csv(comparison_path)
     melted_df = results_df.melt(
@@ -142,52 +117,74 @@ def plot_linear_coefficients(model, model_name: str, output_path: Path, top_n: i
     plt.close()
 
 
-def main() -> None:
+def save_actual_vs_predicted_plot(model, X_test, y_test, model_name: str, output_path: Path) -> None:
+    y_pred = model.predict(X_test)
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(x=y_test, y=y_pred, color="#2563eb", s=55)
+    min_value = min(y_test.min(), y_pred.min())
+    max_value = max(y_test.max(), y_pred.max())
+    plt.plot([min_value, max_value], [min_value, max_value], color="#dc2626", linewidth=2)
+    plt.xlabel("Actual G3")
+    plt.ylabel("Predicted G3")
+    plt.title(f"Actual vs Predicted - {model_name}")
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150)
+    plt.close()
+
+def save_feature_importance_plot(random_forest_model, output_csv: Path, output_png: Path) -> None:
+    preprocessor = random_forest_model.named_steps["preprocessor"]
+    regressor = random_forest_model.named_steps["model"]
+    feature_names = preprocessor.get_feature_names_out()
+
+    importance_df = (
+        pd.DataFrame({"feature": feature_names, "importance": regressor.feature_importances_})
+        .sort_values("importance", ascending=False)
+        .head(20)
+    )
+    importance_df.to_csv(output_csv, index=False)
+
+    plt.figure(figsize=(10, 7))
+    sns.barplot(data=importance_df, x="importance", y="feature", hue="feature", legend=False)
+    plt.xlabel("Importance")
+    plt.ylabel("Feature")
+    plt.title("Top 20 Feature Importance - Random Forest")
+    plt.tight_layout()
+    plt.savefig(output_png, dpi=150)
+    plt.close()
+
+def generate_visualizations(models: dict, X_test, y_test, best_model_name: str, open_images: bool = OPEN_IMAGES_AFTER_SAVE) -> None:
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
 
-    models = load_trained_models()
-    print_report_tables()
-
     output_images = [
-        FIGURE_DIR / "model_comparison_metrics.png",
-        FIGURE_DIR / "decision_tree_visualization.png",
-        FIGURE_DIR / "linear_regression_coefficients.png",
-        FIGURE_DIR / "ridge_regression_coefficients.png",
-        FIGURE_DIR / "random_forest_feature_importance.png",
-        FIGURE_DIR / "actual_vs_predicted_best_model.png",
+        FIGURE_DIR / "compare.png",
+        FIGURE_DIR / "tree.png",
+        FIGURE_DIR / "linear.png",
+        FIGURE_DIR / "ridge.png",
+        FIGURE_DIR / "rf.png",
+        FIGURE_DIR / "pred.png",
     ]
 
     plot_model_comparison(output_images[0])
-    plot_decision_tree_model(
-        models["Decision Tree Regressor"],
-        output_images[1],
+    plot_decision_tree_model(models["Decision Tree Regressor"], output_images[1])
+    plot_linear_coefficients(models["Linear Regression"], "Linear Regression", output_images[2])
+    plot_linear_coefficients(models["Ridge Regression"], "Ridge Regression", output_images[3])
+    save_feature_importance_plot(
+        models["Random Forest Regressor"],
+        REPORT_DIR / "random_forest_feature_importance.csv",
+        output_images[4],
     )
-    plot_linear_coefficients(
-        models["Linear Regression"],
-        "Linear Regression",
-        output_images[2],
-    )
-    plot_linear_coefficients(
-        models["Ridge Regression"],
-        "Ridge Regression",
-        output_images[3],
-    )
+    save_actual_vs_predicted_plot(models[best_model_name], X_test, y_test, best_model_name, output_images[5])
 
-    print("Da tao cac hinh truc quan mo hinh trong thu muc:")
+    print("\nDa tao cac hinh truc quan mo hinh trong thu muc:")
     print(FIGURE_DIR)
-    print("- model_comparison_metrics.png")
-    print("- decision_tree_visualization.png")
-    print("- linear_regression_coefficients.png")
-    print("- ridge_regression_coefficients.png")
-    print("- random_forest_feature_importance.png")
-    print("- actual_vs_predicted_best_model.png")
+    for image_path in output_images:
+        print(f"- {image_path.name}")
 
-    if OPEN_IMAGES_AFTER_SAVE:
+    if open_images:
         print("\nDang mo cac hinh anh...")
         for image_path in output_images:
             if image_path.exists():
                 os.startfile(image_path)
 
-
 if __name__ == "__main__":
-    main()
+    raise SystemExit("Hay chay python src\\models.py de train va tao bieu do.")
