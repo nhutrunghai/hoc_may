@@ -12,7 +12,6 @@ from data_loader import (
     TARGET_COLUMN,
     correlation_with_target,
     load_data,
-    missing_value_report,
     save_processed_dataset,
     split_features_target,
     train_test_split_data,
@@ -62,7 +61,6 @@ def evaluate_model(model, X_test, y_test):
     }
 
 
-# Hàm chính: đọc dữ liệu, xử lý, train và đánh giá các mô hình
 def train_all_models(return_models=False):
     os.makedirs(REPORTS, exist_ok=True)
     os.makedirs(FIGURES, exist_ok=True)
@@ -70,8 +68,6 @@ def train_all_models(return_models=False):
     # Bước 1: Đọc dữ liệu từ file CSV
     df = load_data(DATA_PATH)
     print("Kich thuoc du lieu:", df.shape)
-    print("\nGia tri thieu theo cot:")
-    print(missing_value_report(df))
 
     # Bước 2: Mã hóa cột chữ thành cột số và lưu ra file processed
     encoded_df = save_processed_dataset(df, PROCESSED_PATH)

@@ -58,8 +58,8 @@ Thuật toán
   ├─────────────────────────┼──────────────────────────────────────┤
   │ Linear Regression       │ Hồi quy tuyến tính đa biến           │
   │ Ridge Regression        │ Hồi quy tuyến tính có regularization │
-  │ Decision Tree Regressor │ Hồi quy cây                          │
-  │ Random Forest Regressor │ Hồi quy ensemble / random forest     │
+  │ Decision Tree Regressor │ Mô hình cây quyết định hồi quy       │
+  │ Random Forest Regressor │ Mô hình Rừng ngẫu nhiên dạng hồi quy │
   │ KNN Regressor           │ Hồi quy dựa trên láng giềng gần nhất │
   └─────────────────────────┴──────────────────────────────────────┘  
 
@@ -104,7 +104,7 @@ Thuật toán
   > số dự đoán, mà còn thêm một phần phạt vào các hệ số. Phần phạt này làm cho các hệ số không bị quá lớn.
   >
   > Có thể hiểu đơn giản là nếu Linear Regression chỉ tập trung tìm bộ hệ số sao cho sai số nhỏ nhất, thì
-  > Ridge Regression vừa muốn sai số nhỏ, vừa muốn mô hình đơn giản hơn bằng cách giữ các hệ số ở mức hợp lý.
+  > Ridge Regression vừa muốn sai số nhỏ, vừa muốn các trọng số bị quá lớn , quá nhạy cảm khiến overtiing 
   >
   > Điều này giúp mô hình ổn định hơn, đặc biệt khi các thuộc tính đầu vào có liên quan mạnh với nhau, ví dụ
   > G1 và G2. Nếu hệ số quá lớn, mô hình có thể học quá sát dữ liệu train và dự đoán kém trên dữ liệu mới.
@@ -112,6 +112,7 @@ Thuật toán
   > Ưu điểm của Ridge Regression là giảm overfitting, ổn định hơn Linear Regression trong một số trường hợp,
   > và vẫn giữ được tính dễ giải thích của mô hình tuyến tính. Nhược điểm là mô hình vẫn giả định quan hệ
   > tuyến tính, nên nếu dữ liệu có quan hệ phi tuyến mạnh thì Ridge cũng chưa xử lý tốt.
+  LOSS = MSE + alpha + ( w1**2 + w1**2)
 
   Decision Tree Regressor
 

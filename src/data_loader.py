@@ -14,9 +14,6 @@ def load_data(csv_path):
         raise FileNotFoundError(f"Khong tim thay file du lieu: {csv_path}")
     return pd.read_csv(csv_path)
 
-# Đếm số giá trị bị thiếu trong từng cột
-def missing_value_report(df):
-    return df.isna().sum()
 
 # Xử lý dữ liệu thiếu và mã hóa cột chữ thành cột số
 def encode_data(df):
