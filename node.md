@@ -83,14 +83,9 @@ Thuật toán
   > sai số. Mục tiêu của mô hình là tìm bộ hệ số sao cho sai số giữa điểm thực tế và điểm dự đoán là nhỏ
   > nhất. Trong thư viện scikit-learn, mô hình LinearRegression sử dụng phương pháp bình phương tối thiểu,
   > tức là tối thiểu hóa tổng bình phương sai số.
-  >
-  > Sau khi huấn luyện xong, khi đưa vào thông tin của một học sinh mới, mô hình sẽ thay các giá trị đầu vào
-  > vào công thức đã học để dự đoán điểm G3.
-  >
-  > Ưu điểm của Linear Regression là đơn giản, dễ hiểu, dễ giải thích và phù hợp để làm mô hình nền cho bài
-  > toán hồi quy. Tuy nhiên, nhược điểm là mô hình giả định mối quan hệ giữa các biến là tuyến tính, nên nếu
-  > dữ liệu có quan hệ phức tạp hoặc phi tuyến thì kết quả có thể không tốt bằng các mô hình khác như
-  > Decision Tree hoặc Random Forest
+  Về cơ chế vận hành, cấu phần LinearRegression của scikit-learn sử dụng Phương pháp bình phương tối thiểu (OLS). Thuật toán này áp dụng đại số ma trận để tính toán một mạch ra bộ trọng số tối ưu nhằm tối thiểu hóa tổng bình phương sai số,
+  W  = (XT x X)-1 x Y
+
 
 
   Ridge Regression

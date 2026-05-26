@@ -56,6 +56,7 @@ def evaluate_model(model, X_test, y_test):
 
     return {
         "MAE": mean_absolute_error(y_test, y_pred),
+        "MSE": mse,
         "RMSE": rmse,
         "R-squared": r2_score(y_test, y_pred),
     }
