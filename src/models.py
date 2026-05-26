@@ -7,43 +7,25 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.tree import DecisionTreeRegressor
 
-try:
-    from sklearn.metrics import root_mean_squared_error
-except ImportError:
-    root_mean_squared_error = None
+from data_loader import (
+    RANDOM_STATE,
+    TARGET_COLUMN,
+    correlation_with_target,
+    load_data,
+    missing_value_report,
+    save_processed_dataset,
+    split_features_target,
+    train_test_split_data,
+)
 
-try:
-    from .data_loader import (
-        RANDOM_STATE,
-        TARGET_COLUMN,
-        correlation_with_target,
-        load_data,
-        missing_value_report,
-        save_processed_dataset,
-        split_features_target,
-        train_test_split_data,
-    )
-except ImportError:
-    from data_loader import (
-        RANDOM_STATE,
-        TARGET_COLUMN,
-        correlation_with_target,
-        load_data,
-        missing_value_report,
-        save_processed_dataset,
-        split_features_target,
-        train_test_split_data,
-    )
-
-
-# Duong dan chinh cua du an
+# Đường dẫn chính của dự án
 DATA_PATH = "data/raw/student-por-v1.csv"
 PROCESSED_PATH = "data/processed/student-por-v1-processed.csv"
 REPORTS = "reports"
 FIGURES = "reports/figures"
 
 
-# Buoc 5: Khai bao 4 mo hinh can so sanh
+# Bước 5: Khai báo 4 mô hình cần so sánh
 def build_models():
     return {
         "Linear Regression": LinearRegression(),
@@ -65,13 +47,12 @@ def build_models():
         ),
     }
 
-# Buoc 6: Danh gia mo hinh bang MAE, RMSE va R-squared
+# Bước 6: Đánh giá mô hình bằng MAE, RMSE và R-squared
 def evaluate_model(model, X_test, y_test):
     y_pred = model.predict(X_test)
-    if root_mean_squared_error is None:
-        rmse = mean_squared_error(y_test, y_pred, squared=False)
-    else:
-        rmse = root_mean_squared_error(y_test, y_pred)
+
+    mse = mean_squared_error(y_test, y_pred)
+    rmse = mse ** 0.5
 
     return {
         "MAE": mean_absolute_error(y_test, y_pred),
@@ -80,33 +61,33 @@ def evaluate_model(model, X_test, y_test):
     }
 
 
-# Ham chinh: doc du lieu, xu ly, train va danh gia cac mo hinh
+# Hàm chính: đọc dữ liệu, xử lý, train và đánh giá các mô hình
 def train_all_models(return_models=False):
     os.makedirs(REPORTS, exist_ok=True)
     os.makedirs(FIGURES, exist_ok=True)
 
-    # Buoc 1: Doc du lieu tu file CSV
+    # Bước 1: Đọc dữ liệu từ file CSV
     df = load_data(DATA_PATH)
     print("Kich thuoc du lieu:", df.shape)
     print("\nGia tri thieu theo cot:")
     print(missing_value_report(df))
 
-    # Buoc 2: Ma hoa cot chu thanh cot so va luu ra file processed
+    # Bước 2: Mã hóa cột chữ thành cột số và lưu ra file processed
     encoded_df = save_processed_dataset(df, PROCESSED_PATH)
 
-    # Buoc 3: Xem cac cot nao tuong quan manh voi diem G3
+    # Bước 3: Xem các cột nào tương quan mạnh với điểm G3
     corr = correlation_with_target(df)
     corr.to_csv(f"{REPORTS}/correlation_with_G3.csv", header=["correlation"])
     print("\nTop 15 bien tuong quan manh nhat voi G3:")
     print(corr.head(15))
 
-    # Buoc 4: Tach X la du lieu dau vao, y la diem can du doan
+    # Bước 4: Tách X là dữ liệu đầu vào, y là điểm cần dự đoán
     X, y = split_features_target(encoded_df, TARGET_COLUMN)
     X_train, X_test, y_train, y_test = train_test_split_data(X, y)
     feature_names = X_train.columns.tolist()
     models = build_models()
 
-    # Buoc 7: Lan luot train tung mo hinh va luu ket qua danh gia
+    # Bước 7: Lần lượt train từng mô hình và lưu kết quả đánh giá
     results = []
     fitted_models = {}
     ridge_best_alpha = None
@@ -126,7 +107,7 @@ def train_all_models(return_models=False):
         metrics = evaluate_model(model, X_test, y_test)
         results.append({"Model": model_name, **metrics})
 
-    # Buoc 8: Sap xep ket qua theo RMSE tang dan de tim mo hinh tot nhat
+    # Bước 8: Sắp xếp kết quả theo RMSE tăng dần để tìm mô hình tốt nhất
     results_df = (
         pd.DataFrame(results)
         .sort_values("RMSE", ascending=True)
@@ -145,13 +126,9 @@ def train_all_models(return_models=False):
     return results_df
 
 
-# Chay file nay se train model va tao bieu do
 def main():
     _, fitted_models, X_test, y_test, best_model_name, feature_names = train_all_models(return_models=True)
-    try:
-        from .visualize_models import generate_visualizations
-    except ImportError:
-        from visualize_models import generate_visualizations
+    from visualize_models import generate_visualizations
 
     generate_visualizations(fitted_models, X_test, y_test, best_model_name, feature_names)
 

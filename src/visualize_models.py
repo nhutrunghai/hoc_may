@@ -5,10 +5,7 @@ import pandas as pd
 import seaborn as sns
 from sklearn.tree import plot_tree
 
-try:
-    from .models import REPORTS, FIGURES
-except ImportError:
-    from models import REPORTS, FIGURES
+from models import REPORTS, FIGURES
 
 OPEN_IMAGES_AFTER_SAVE = True
 
