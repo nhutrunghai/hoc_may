@@ -1,83 +1,74 @@
 # Student Score Prediction
 
-Du an du doan diem cuoi ky `G3` cua hoc sinh/sinh vien tu bo du lieu `student-por-v1.csv`.
+Dự án dự đoán điểm cuối kỳ `G3` của học sinh/sinh viên từ bộ dữ liệu `student-por-v1.csv`.
 
-Du an huan luyen va so sanh 4 mo hinh hoi quy:
+Dự án huấn luyện và so sánh 4 mô hình hồi quy:
 
 - Linear Regression
-- Ridge Regression, co tim `alpha` tot nhat bang `GridSearchCV`
+- Ridge Regression, có tìm `alpha` tốt nhất bằng `GridSearchCV`
 - Decision Tree Regressor
 - Random Forest Regressor
 
-## Cau truc thu muc
+## Cấu trúc thư mục
 
+```text
 student_score_prediction/
 |-- data/
-| |-- raw/
-| | `-- student-por-v1.csv
+|   |-- raw/
+|   |   `-- student-por-v1.csv
 |   `-- processed/
-|-- notebooks/
 |-- reports/
-| `-- figures/
+|   `-- figures/
 |-- src/
 |   |-- data_loader.py
 |   |-- models.py
 |   `-- visualize_models.py
 |-- requirements.txt
 `-- README.md
-
 ```
 
-## Cai thu vien
+## Cài thư viện
 
-Cai cac thu vien can thiet:
-
-
+```powershell
 python -m pip install -r requirements.txt
 ```
 
-File `requirements.txt` gom cac thu vien chinh:
+File `requirements.txt` gồm các thư viện chính:
 
 - `pandas`
 - `scikit-learn`
 - `matplotlib`
 - `seaborn`
 
-## Chay huan luyen mo hinh
+## Chạy dự án
 
-Chay file huan luyen:
-
-python src\models.py
-
-Khi chay xong, chuong trinh se:
-
-- Doc du lieu tu `data/raw/student-por-v1.csv`
-- Xu ly du lieu va ma hoa bien phan loai
-- Chia du lieu thanh tap train/test
-- Huan luyen 4 mo hinh hoi quy
-- So sanh cac mo hinh bang `MAE`, `RMSE`, `R-squared`
-- Luu ket qua danh gia vao thu muc `reports/`
-- Tao cac bieu do trong `reports/figures/`
-
-## Ket qua dau ra
-
-Sau khi chay mo hinh, cac file chinh duoc tao ra gom:
-
-- `data/processed/student-por-v1-processed.csv`: du lieu sau khi xu ly va one-hot encoding
-- `reports/model_comparison.csv`: bang so sanh ket qua cac mo hinh
-- `reports/correlation_with_G3.csv`: tuong quan giua cac bien va diem `G3`
-- `reports/random_forest_feature_importance.csv`: do quan trong cua cac bien theo Random Forest
-- `reports/figures/pred.png`: bieu do gia tri that va gia tri du doan cua mo hinh tot nhat
-- `reports/figures/compare.png`: bieu do so sanh cac chi so danh gia
-- `reports/figures/tree.png`: hinh minh hoa cay quyet dinh
-- `reports/figures/linear.png`: he so cua Linear Regression
-- `reports/figures/ridge.png`: he so cua Ridge Regression
-- `reports/figures/rf.png`: bieu do feature importance cua Random Forest
-
-## Quy trinh chay nhanh
+Chạy file chính:
 
 ```powershell
-cd D:\hocmayfinal\student_score_prediction
-python -m pip install -r requirements.txt
 python src\models.py
-````
+```
+
+Khi chạy xong, chương trình sẽ:
+
+- Đọc dữ liệu từ `data/raw/student-por-v1.csv`
+- Mã hóa dữ liệu chữ thành số bằng one-hot encoding
+- Chia dữ liệu thành tập train/test
+- Huấn luyện 4 mô hình hồi quy
+- So sánh các mô hình bằng `MAE`, `MSE`, `RMSE`, `R-squared`
+- Lưu kết quả đánh giá vào thư mục `reports/`
+- Tạo các biểu đồ trong `reports/figures/`
+
+## Kết quả đầu ra
+
+Sau khi chạy mô hình, các file chính được tạo ra gồm:
+
+- `data/processed/student-por-v1-processed.csv`: dữ liệu sau khi xử lý và one-hot encoding
+- `reports/model_comparison.csv`: bảng so sánh kết quả các mô hình
+- `reports/correlation_with_G3.csv`: tương quan giữa các biến và điểm `G3`
+- `reports/random_forest_feature_importance.csv`: độ quan trọng của các biến theo Random Forest
+- `reports/figures/compare.png`: biểu đồ so sánh các chỉ số đánh giá
+- `reports/figures/pred.png`: biểu đồ giá trị thật và giá trị dự đoán của mô hình tốt nhất
+- `reports/figures/rf.png`: biểu đồ feature importance của Random Forest
+- `reports/figures/tree.png`: hình minh họa cây quyết định
+- `reports/figures/linear.png`: hệ số của Linear Regression
+- `reports/figures/ridge.png`: hệ số của Ridge Regression

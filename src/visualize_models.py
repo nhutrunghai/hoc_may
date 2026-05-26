@@ -1,6 +1,10 @@
 import os
+import sys
 
 import matplotlib.pyplot as plt
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 import pandas as pd
 import seaborn as sns
 from sklearn.tree import plot_tree
@@ -17,23 +21,23 @@ def print_report_tables():
 
     if os.path.exists(comparison_path):
         results_df = pd.read_csv(comparison_path)
-        print("\n=== Bang so sanh 4 mo hinh tren tap Test ===")
+        print("\n=== Bảng so sánh 4 mô hình trên tập Test ===")
         print(results_df.to_string(index=False))
 
         best_model = results_df.sort_values("RMSE", ascending=True).iloc[0]
-        print(f"\nMo hinh tot nhat theo RMSE: {best_model['Model']}")
+        print(f"\nMô hình tốt nhất theo RMSE: {best_model['Model']}")
         print(f"RMSE: {best_model['RMSE']:.4f}")
         print(f"MAE: {best_model['MAE']:.4f}")
         print(f"R-squared: {best_model['R-squared']:.4f}")
 
     if os.path.exists(correlation_path):
         correlation_df = pd.read_csv(correlation_path)
-        print("\n=== Top 15 bien tuong quan manh nhat voi G3 ===")
+        print("\n=== Top 15 biến tương quan mạnh nhất với G3 ===")
         print(correlation_df.head(15).to_string(index=False))
 
     if os.path.exists(feature_importance_path):
         importance_df = pd.read_csv(feature_importance_path)
-        print("\n=== Top 20 Feature Importance cua Random Forest ===")
+        print("\n=== Top 20 độ quan trọng của biến theo Random Forest ===")
         print(importance_df.head(20).to_string(index=False))
 
 
@@ -41,7 +45,7 @@ def print_report_tables():
 def plot_model_comparison(output_path):
     comparison_path = f"{REPORTS}/model_comparison.csv"
     if not os.path.exists(comparison_path):
-        raise FileNotFoundError(f"Chua co file bao cao: {comparison_path}")
+        raise FileNotFoundError(f"Chưa có file báo cáo: {comparison_path}")
 
     results_df = pd.read_csv(comparison_path)
     melted_df = results_df.melt(
@@ -161,16 +165,16 @@ def generate_visualizations(models, X_test, y_test, best_model_name, feature_nam
     )
     save_actual_vs_predicted_plot(models[best_model_name], X_test, y_test, best_model_name, output_images[5])
 
-    print("\nDa tao cac hinh truc quan mo hinh trong thu muc:")
+    print("\nĐã tạo các hình trực quan mô hình trong thư mục:")
     print(FIGURES)
     for image_path in output_images:
         print(f"- {os.path.basename(image_path)}")
 
     if open_images:
-        print("\nDang mo cac hinh anh...")
+        print("\nĐang mở các hình ảnh...")
         for image_path in output_images:
             if os.path.exists(image_path):
                 os.startfile(os.path.abspath(image_path))
 
 if __name__ == "__main__":
-    raise SystemExit("Hay chay python src\\models.py de train va tao bieu do.")
+    raise SystemExit("Hãy chạy python src\\models.py để train và tạo biểu đồ.")

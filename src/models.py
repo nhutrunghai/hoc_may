@@ -1,4 +1,8 @@
 import os
+import sys
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
@@ -67,7 +71,7 @@ def train_all_models(return_models=False):
 
     # Bước 1: Đọc dữ liệu từ file CSV
     df = load_data(DATA_PATH)
-    print("Kich thuoc du lieu:", df.shape)
+    print("Kích thước dữ liệu:", df.shape)
 
     # Bước 2: Mã hóa cột chữ thành cột số và lưu ra file processed
     encoded_df = save_processed_dataset(df, PROCESSED_PATH)
@@ -75,7 +79,7 @@ def train_all_models(return_models=False):
     # Bước 3: Xem các cột nào tương quan mạnh với điểm G3
     corr = target_corr(df)
     corr.to_csv(f"{REPORTS}/correlation_with_G3.csv", header=["correlation"])
-    print("\nTop 15 bien tuong quan manh nhat voi G3:")
+    print("\nTop 15 biến tương quan mạnh nhất với G3:")
     print(corr.head(15))
 
     # Bước 4: Tách X là dữ liệu đầu vào, y là điểm cần dự đoán
@@ -89,7 +93,7 @@ def train_all_models(return_models=False):
     fitted_models = {}
     ridge_best_alpha = None
     for model_name, model in models.items():
-        print(f"\nDang huan luyen: {model_name}")
+        print(f"\nĐang huấn luyện: {model_name}")
         model.fit(X_train, y_train)
 
         best_alpha = None
@@ -113,11 +117,11 @@ def train_all_models(return_models=False):
     results_df.to_csv(f"{REPORTS}/model_comparison.csv", index=False)
 
     best_model_name = results_df.loc[0, "Model"]
-    print("\nBang so sanh mo hinh tren tap Test:")
+    print("\nBảng so sánh mô hình trên tập Test:")
     print(results_df.to_string(index=False))
-    print(f"\nMo hinh tot nhat theo RMSE: {best_model_name}")
+    print(f"\nMô hình tốt nhất theo RMSE: {best_model_name}")
     if ridge_best_alpha is not None:
-        print(f"Best alpha cua Ridge Regression: {ridge_best_alpha}")
+        print(f"Best alpha của Ridge Regression: {ridge_best_alpha}")
     if return_models:
         return results_df, fitted_models, X_test, y_test, best_model_name, feature_names
     return results_df
