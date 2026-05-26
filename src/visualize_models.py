@@ -46,7 +46,7 @@ def plot_model_comparison(output_path):
     results_df = pd.read_csv(comparison_path)
     melted_df = results_df.melt(
         id_vars="Model",
-        value_vars=["MAE", "RMSE", "R-squared"],
+        value_vars=["MAE", "MSE", "RMSE", "R-squared"],
         var_name="Metric",
         value_name="Score",
     )

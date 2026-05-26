@@ -10,7 +10,7 @@ from sklearn.tree import DecisionTreeRegressor
 from data_loader import (
     RANDOM_STATE,
     TARGET_COLUMN,
-    correlation_with_target,
+    target_corr,
     load_data,
     save_processed_dataset,
     split_features_target,
@@ -73,7 +73,7 @@ def train_all_models(return_models=False):
     encoded_df = save_processed_dataset(df, PROCESSED_PATH)
 
     # Bước 3: Xem các cột nào tương quan mạnh với điểm G3
-    corr = correlation_with_target(df)
+    corr = target_corr(df)
     corr.to_csv(f"{REPORTS}/correlation_with_G3.csv", header=["correlation"])
     print("\nTop 15 bien tuong quan manh nhat voi G3:")
     print(corr.head(15))
