@@ -1,74 +1,111 @@
-# Student Score Prediction
+<div align="center">
 
-Dự án dự đoán điểm cuối kỳ `G3` của học sinh/sinh viên từ bộ dữ liệu `student-por-v1.csv`.
+# 📊 Dự Đoán Điểm Sinh Viên
 
-Dự án huấn luyện và so sánh 4 mô hình hồi quy:
+### Machine Learning project so sánh nhiều mô hình hồi quy
 
-- Linear Regression
-- Ridge Regression, có tìm `alpha` tốt nhất bằng `GridSearchCV`
-- Decision Tree Regressor
-- Random Forest Regressor
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![scikit--learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?style=for-the-badge)
 
-## Cấu trúc thư mục
+</div>
+
+---
+
+## 🎯 Mục tiêu
+
+Dự án sử dụng Machine Learning để dự đoán điểm cuối kỳ `G3` từ bộ dữ liệu `student-por-v1.csv`. Project tập trung vào quy trình xử lý dữ liệu, huấn luyện mô hình, so sánh kết quả và trực quan hóa báo cáo.
+
+---
+
+## 🧠 Các mô hình sử dụng
+
+| Mô hình | Vai trò |
+|---|---|
+| Linear Regression | Baseline model đơn giản |
+| Ridge Regression | Hồi quy tuyến tính có regularization |
+| Decision Tree Regressor | Mô hình cây quyết định |
+| Random Forest Regressor | Ensemble model để cải thiện độ ổn định |
+
+---
+
+## 🔄 Pipeline xử lý
 
 ```text
-student_score_prediction/
-|-- data/
-|   |-- raw/
-|   |   `-- student-por-v1.csv
-|   `-- processed/
-|-- reports/
-|   `-- figures/
-|-- src/
-|   |-- data_loader.py
-|   |-- models.py
-|   `-- visualize_models.py
-|-- requirements.txt
-`-- README.md
+📥 Đọc dữ liệu CSV
+   ↓
+🧹 Tiền xử lý dữ liệu
+   ↓
+🔢 One-hot encoding biến phân loại
+   ↓
+✂️ Chia train/test
+   ↓
+🤖 Huấn luyện 4 mô hình
+   ↓
+📊 So sánh MAE / MSE / RMSE / R²
+   ↓
+🖼️ Xuất biểu đồ và báo cáo
 ```
 
-## Cài thư viện
+---
 
-```powershell
+## 🗂️ Cấu trúc thư mục
+
+```text
+hoc_may/
+├── data/
+│   ├── raw/          # Dữ liệu gốc
+│   └── processed/    # Dữ liệu sau xử lý
+├── reports/
+│   └── figures/      # Biểu đồ kết quả
+├── src/
+│   ├── data_loader.py
+│   ├── models.py
+│   └── visualize_models.py
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## 🚀 Cách chạy
+
+### 1. Cài thư viện
+
+```bash
 python -m pip install -r requirements.txt
 ```
 
-File `requirements.txt` gồm các thư viện chính:
+### 2. Chạy mô hình
 
-- `pandas`
-- `scikit-learn`
-- `matplotlib`
-- `seaborn`
-
-## Chạy dự án
-
-Chạy file chính:
-
-```powershell
-python src\models.py
+```bash
+python src/models.py
 ```
 
-Khi chạy xong, chương trình sẽ:
+---
 
-- Đọc dữ liệu từ `data/raw/student-por-v1.csv`
-- Mã hóa dữ liệu chữ thành số bằng one-hot encoding
-- Chia dữ liệu thành tập train/test
-- Huấn luyện 4 mô hình hồi quy
-- So sánh các mô hình bằng `MAE`, `MSE`, `RMSE`, `R-squared`
-- Lưu kết quả đánh giá vào thư mục `reports/`
-- Tạo các biểu đồ trong `reports/figures/`
+## 📦 Kết quả đầu ra
 
-## Kết quả đầu ra
+| File | Nội dung |
+|---|---|
+| `data/processed/student-por-v1-processed.csv` | Dữ liệu đã xử lý |
+| `reports/model_comparison.csv` | Bảng so sánh mô hình |
+| `reports/correlation_with_G3.csv` | Tương quan với điểm G3 |
+| `reports/random_forest_feature_importance.csv` | Feature importance |
+| `reports/figures/*.png` | Biểu đồ đánh giá và trực quan hóa |
 
-Sau khi chạy mô hình, các file chính được tạo ra gồm:
+---
 
-- `data/processed/student-por-v1-processed.csv`: dữ liệu sau khi xử lý và one-hot encoding
-- `reports/model_comparison.csv`: bảng so sánh kết quả các mô hình
-- `reports/correlation_with_G3.csv`: tương quan giữa các biến và điểm `G3`
-- `reports/random_forest_feature_importance.csv`: độ quan trọng của các biến theo Random Forest
-- `reports/figures/compare.png`: biểu đồ so sánh các chỉ số đánh giá
-- `reports/figures/pred.png`: biểu đồ giá trị thật và giá trị dự đoán của mô hình tốt nhất
-- `reports/figures/rf.png`: biểu đồ feature importance của Random Forest
-- `reports/figures/tree.png`: hình minh họa cây quyết định
-- `reports/figures/linear.png`: hệ số của Linear Regression
-- `reports/figures/ridge.png`: hệ số của Ridge Regression
+## 📌 Ghi chú
+
+Tên repo hiện tại là `hoc_may`. Nếu dùng làm portfolio, nên đổi thành `student-score-prediction` hoặc `university-score-prediction` để chuyên nghiệp hơn.
+
+---
+
+<div align="center">
+
+Project Machine Learning phục vụ học tập và thực hành quy trình modeling.  
+Developed by [Nhữ Trung Hải](https://github.com/nhutrunghai)
+
+</div>
