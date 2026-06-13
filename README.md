@@ -53,7 +53,7 @@ Dự án sử dụng Machine Learning để dự đoán điểm cuối kỳ `G3`
 ## 🗂️ Cấu trúc thư mục
 
 ```text
-hoc_may/
+student-score-prediction/
 ├── data/
 │   ├── raw/          # Dữ liệu gốc
 │   └── processed/    # Dữ liệu sau xử lý
@@ -97,9 +97,13 @@ python src/models.py
 
 ---
 
-## 📌 Ghi chú
+## 🧭 Roadmap
 
-Tên repo hiện tại là `hoc_may`. Nếu dùng làm portfolio, nên đổi thành `student-score-prediction` hoặc `university-score-prediction` để chuyên nghiệp hơn.
+- [ ] Thêm biểu đồ preview trực tiếp vào README
+- [ ] Thêm notebook giải thích quy trình modeling
+- [ ] Thử thêm mô hình Gradient Boosting/XGBoost
+- [ ] Thêm phần nhận xét mô hình tốt nhất
+- [ ] Chuẩn hóa báo cáo kết quả cuối cùng
 
 ---
 
